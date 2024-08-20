@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.galileo.cu.commons.models.Conexiones;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
 import com.galileo.cu.commons.models.Usuarios;
+import com.galileo.cu.unidadesusuarios.clientes.TraccarClient;
 import com.galileo.cu.unidadesusuarios.repositorios.ConexionesRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.ExpiraUserRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.UsuariosRepository;
@@ -26,6 +27,9 @@ public class ExpirationCheckTask {
 
     @Autowired
     private UsuariosRepository usersRepository;
+
+    @Autowired
+    private TraccarClient traccarClient;
 
     @Autowired
     private ConexionesRepository conRepo;
@@ -48,6 +52,9 @@ public class ExpirationCheckTask {
             List<Conexiones> cons = conRepo.findByServicio("TRACCAR");
             Conexiones con = cons.get(0);
             log.info("Conexión Usuario: " + con.getUsuario());
+
+            String resDevices = traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
+            log.info(resDevices);
         }
     }
 }
