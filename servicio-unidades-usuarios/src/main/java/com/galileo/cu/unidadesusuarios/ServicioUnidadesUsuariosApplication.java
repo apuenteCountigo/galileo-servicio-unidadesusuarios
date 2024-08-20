@@ -5,8 +5,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 @EnableEurekaClient
 @EntityScan({ "com.galileo.cu.commons.models" })
 public class ServicioUnidadesUsuariosApplication implements CommandLineRunner {
@@ -18,7 +20,7 @@ public class ServicioUnidadesUsuariosApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("**************************************");
-		System.out.println("Unidades Usuarios V-2408192123");
+		System.out.println("Unidades Usuarios V-2408200236");
 	}
 
 }
