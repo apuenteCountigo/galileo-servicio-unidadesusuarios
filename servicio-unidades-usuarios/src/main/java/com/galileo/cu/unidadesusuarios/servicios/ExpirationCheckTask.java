@@ -26,7 +26,7 @@ public class ExpirationCheckTask {
     private UsuariosRepository usersRepository;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 48 7 * * *")
+    @Scheduled(cron = "0 53 7 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -39,9 +39,9 @@ public class ExpirationCheckTask {
         log.info("::::::QUANTY==" + expiredRecords.size());
 
         for (UnidadesUsuarios record : expiredRecords) {
-            log.info("Registro expirado: " + record.getId());
-            Optional<Usuarios> user = usersRepository.findById(record.getId());
-            log.info("ID TRACCAR: " + user.get().getTraccar());
+            log.info("Registro expirado: " + record.getUsuario().getTraccarID());
+            // Optional<Usuarios> user = usersRepository.findById(record.getId());
+            // log.info("ID TRACCAR: " + user.get().getTraccar());
         }
     }
 }
