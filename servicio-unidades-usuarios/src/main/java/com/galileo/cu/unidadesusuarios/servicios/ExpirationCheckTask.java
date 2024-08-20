@@ -20,10 +20,14 @@ public class ExpirationCheckTask {
     private ExpiraUserRepository expiraUserRepository;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 52 6 * * *")
+    @Scheduled(cron = "0 2 7 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        // Obtener la fecha y hora actual, truncando los nanosegundos para una
+        // comparación precisa
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault()).withNano(0);
+
         List<UnidadesUsuarios> expiredRecords = expiraUserRepository.findByExpiraBefore(now);
         log.info("::::::NOW==" + now.toString());
         log.info("::::::QUANTY==" + expiredRecords.size());
