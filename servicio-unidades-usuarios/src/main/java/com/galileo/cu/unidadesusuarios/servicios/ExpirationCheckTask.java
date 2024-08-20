@@ -20,7 +20,7 @@ public class ExpirationCheckTask {
     private ExpiraUserRepository expiraUserRepository;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 35 6 * * *")
+    @Scheduled(cron = "0 40 6 * * *")
     public void checkForExpiredRecords() {
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         List<UnidadesUsuarios> expiredRecords = expiraUserRepository.findByExpiraBefore(now);
