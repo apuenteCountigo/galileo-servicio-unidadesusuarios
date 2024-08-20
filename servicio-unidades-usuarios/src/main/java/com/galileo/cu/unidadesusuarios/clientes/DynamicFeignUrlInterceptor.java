@@ -20,8 +20,9 @@ public class DynamicFeignUrlInterceptor implements RequestInterceptor {
     public void apply(RequestTemplate template) {
         List<Conexiones> cons = conRepo.findByServicio("TRACCAR");
         Conexiones con = cons.get(0);
-        String dynamicUrl = con.getIpServicio() + ":" + con.getPuerto() + "/api"; // Aquí obtienes la URL desde la base
-                                                                                  // de datos
+        String dynamicUrl = "http://" + con.getIpServicio() + ":" + con.getPuerto() + "/api"; // Aquí obtienes la URL
+                                                                                              // desde la base
+        // de datos
         template.target(dynamicUrl); // Establece la URL base dinámica
 
         // Obtener las credenciales desde la base de datos o configuración
