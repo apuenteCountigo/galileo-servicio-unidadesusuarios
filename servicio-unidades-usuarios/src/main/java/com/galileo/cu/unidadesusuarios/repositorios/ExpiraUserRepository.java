@@ -7,8 +7,7 @@ import com.galileo.cu.commons.models.UnidadesUsuarios;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.sql.Timestamp;
 
 public interface ExpiraUserRepository extends JpaRepository<UnidadesUsuarios, Long> {
-    List<UnidadesUsuarios> findByExpiraBefore(Timestamp dateTime);
+    List<UnidadesUsuarios> findByExpiraBefore(LocalDateTime dateTime);
 }

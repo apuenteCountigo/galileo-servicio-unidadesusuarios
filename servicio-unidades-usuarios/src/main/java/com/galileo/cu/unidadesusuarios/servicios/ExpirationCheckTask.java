@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.sql.Timestamp;
 
 @Slf4j
 @Component
@@ -21,15 +20,16 @@ public class ExpirationCheckTask {
     private ExpiraUserRepository expiraUserRepository;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 17 7 * * *")
+    @Scheduled(cron = "0 30 7 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
-        LocalDateTime nowLocalDateTime = LocalDateTime.now(ZoneId.systemDefault()).withNano(0);
-        Timestamp nowTimestamp = Timestamp.valueOf(nowLocalDateTime);
+        // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        // Obtener la fecha y hora actual, truncando los nanosegundos para una
+        // comparación precisa
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault()).withNano(0);
 
-        // Buscar registros con fecha de expiración anterior a 'now'
-        List<UnidadesUsuarios> expiredRecords = expiraUserRepository.findByExpiraBefore(nowTimestamp);
-        log.info("::::::NOW==" + nowTimestamp.toString());
+        List<UnidadesUsuarios> expiredRecords = expiraUserRepository.findByExpiraBefore(now);
+        log.info("::::::NOW==" + now.toString());
         log.info("::::::QUANTY==" + expiredRecords.size());
 
         for (UnidadesUsuarios record : expiredRecords) {
