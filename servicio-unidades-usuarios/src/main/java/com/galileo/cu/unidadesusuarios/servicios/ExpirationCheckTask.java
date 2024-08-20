@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.galileo.cu.commons.models.Conexiones;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
 import com.galileo.cu.commons.models.Usuarios;
+import com.galileo.cu.unidadesusuarios.repositorios.ConexionesRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.ExpiraUserRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.UsuariosRepository;
 
@@ -25,8 +27,11 @@ public class ExpirationCheckTask {
     @Autowired
     private UsuariosRepository usersRepository;
 
+    @Autowired
+    private ConexionesRepository conRepo;
+
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 53 7 * * *")
+    @Scheduled(cron = "0 45 8 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -40,8 +45,9 @@ public class ExpirationCheckTask {
 
         for (UnidadesUsuarios record : expiredRecords) {
             log.info("Registro expirado: " + record.getUsuario().getTraccarID());
-            // Optional<Usuarios> user = usersRepository.findById(record.getId());
-            // log.info("ID TRACCAR: " + user.get().getTraccar());
+            List<Conexiones> cons = conRepo.findByServicio("TRACCAR");
+            Conexiones con = cons.get(0);
+            log.info("Conexión Usuario: " + con.getUsuario());
         }
     }
 }
