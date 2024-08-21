@@ -9,6 +9,7 @@ import com.galileo.cu.commons.models.Conexiones;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
 import com.galileo.cu.commons.models.Usuarios;
 import com.galileo.cu.commons.models.dto.DevicesTraccar;
+import com.galileo.cu.commons.models.dto.GroupsTraccar;
 import com.galileo.cu.unidadesusuarios.clientes.TraccarClient;
 import com.galileo.cu.unidadesusuarios.repositorios.ConexionesRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.ExpiraUserRepository;
@@ -37,7 +38,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 20 2 * * *")
+    @Scheduled(cron = "0 0 3 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -51,16 +52,21 @@ public class ExpirationCheckTask {
 
         for (UnidadesUsuarios record : expiredRecords) {
             log.info("Registro expirado: " + record.getUsuario().getTraccarID());
-            List<Conexiones> cons = conRepo.findByServicio("TRACCAR");
-            Conexiones con = cons.get(0);
-            log.info("Conexión Usuario: " + con.getUsuario());
+            // List<Conexiones> cons = conRepo.findByServicio("TRACCAR");
+            // Conexiones con = cons.get(0);
+            // log.info("Conexión Usuario: " + con.getUsuario());
 
             // String resDevices =
-            // traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
-            List<DevicesTraccar> resDevices = traccarClient.getDevices("1035");
+            List<DevicesTraccar> resDevices = traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
+            // List<DevicesTraccar> resDevices = traccarClient.getDevices("1035");
 
             for (DevicesTraccar dt : resDevices) {
                 log.info(dt.getName());
+            }
+
+            List<GroupsTraccar> resGroups = traccarClient.getGroups(record.getUsuario().getTraccarID().toString());
+            for (GroupsTraccar gt : resGroups) {
+                log.info(gt.getName());
             }
         }
     }
