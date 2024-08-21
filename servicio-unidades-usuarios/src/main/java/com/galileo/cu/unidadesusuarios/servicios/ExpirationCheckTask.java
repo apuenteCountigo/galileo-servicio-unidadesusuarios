@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.galileo.cu.commons.models.Conexiones;
 import com.galileo.cu.commons.models.Objetivos;
+import com.galileo.cu.commons.models.Operaciones;
 import com.galileo.cu.commons.models.Permisos;
 import com.galileo.cu.commons.models.Unidades;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
@@ -59,7 +60,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 0 23 * * *")
+    @Scheduled(cron = "0 12 23 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -122,23 +123,28 @@ public class ExpirationCheckTask {
                 throw new RuntimeException("Fallo consultando grupos en traccar");
             }
 
-            // for (GroupsTraccar gt : resGroups) {
-            // try {
-            // BodyDelGroupPermissions bDGP = new
-            // BodyDelGroupPermissions(record.getUsuario().getTraccarID(),
-            // gt.getId());
-            // try {
-            // traccarClient.delGroups(bDGP);
-            // } catch (Exception e) {
-            // log.error("*******Fallo eliminando grupo en traccar: ", e.getMessage());
-            // throw new RuntimeException("Fallo eliminando grupo en traccar");
-            // }
-            // log.info(gt.getName());
-            // } catch (Exception e) {
-            // log.error("*******Fallo iterando grupos en traccar: ", e.getMessage());
-            // throw new RuntimeException("Fallo iterando grupos en traccar");
-            // }
-            // }
+            for (GroupsTraccar gt : resGroups) {
+                try {
+                    BodyDelGroupPermissions bDGP = new BodyDelGroupPermissions(record.getUsuario().getTraccarID(),
+                            gt.getId());
+                    List<Operaciones> ops = operRepo
+                            .findByIdGrupoAndUnidades(Long.valueOf(gt.getId()), unidad);
+                    log.info("######" + gt.getId() + ":::" + ops.size());
+                    if (ops.size() > 0) {
+                        log.info("****Eliminando Permiso en Grupo");
+                    }
+                    // try {
+                    // traccarClient.delGroups(bDGP);
+                    // } catch (Exception e) {
+                    // log.error("*******Fallo eliminando grupo en traccar: ", e.getMessage());
+                    // throw new RuntimeException("Fallo eliminando grupo en traccar");
+                    // }
+                    log.info(gt.getName());
+                } catch (Exception e) {
+                    log.error("*******Fallo iterando grupos en traccar: ", e.getMessage());
+                    throw new RuntimeException("Fallo iterando grupos en traccar");
+                }
+            }
 
             // try {
             // List<Permisos> permisos = perRepo.findByUsuarios(record.getUsuario());
