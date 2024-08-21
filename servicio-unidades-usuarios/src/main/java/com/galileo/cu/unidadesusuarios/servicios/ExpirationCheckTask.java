@@ -37,7 +37,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 13 2 * * *")
+    @Scheduled(cron = "0 20 2 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -58,7 +58,10 @@ public class ExpirationCheckTask {
             // String resDevices =
             // traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
             List<DevicesTraccar> resDevices = traccarClient.getDevices("1035");
-            log.info(resDevices.get(0).getName());
+
+            for (DevicesTraccar dt : resDevices) {
+                log.info(dt.getName());
+            }
         }
     }
 }
