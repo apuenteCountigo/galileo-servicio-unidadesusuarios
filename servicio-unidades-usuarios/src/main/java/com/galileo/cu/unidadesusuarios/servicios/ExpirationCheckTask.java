@@ -53,7 +53,9 @@ public class ExpirationCheckTask {
             Conexiones con = cons.get(0);
             log.info("Conexión Usuario: " + con.getUsuario());
 
-            String resDevices = traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
+            // String resDevices =
+            // traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
+            String resDevices = traccarClient.getDevices("1035");
             log.info(resDevices);
         }
     }
