@@ -39,7 +39,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 38 3 * * *")
+    @Scheduled(cron = "0 41 3 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
