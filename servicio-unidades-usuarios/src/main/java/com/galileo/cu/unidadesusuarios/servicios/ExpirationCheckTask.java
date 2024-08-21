@@ -6,14 +6,17 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.galileo.cu.commons.models.Conexiones;
+import com.galileo.cu.commons.models.Permisos;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
 import com.galileo.cu.commons.models.Usuarios;
+import com.galileo.cu.commons.models.dto.BodyDelDevicePermissions;
 import com.galileo.cu.commons.models.dto.BodyDelGroupPermissions;
 import com.galileo.cu.commons.models.dto.DevicesTraccar;
 import com.galileo.cu.commons.models.dto.GroupsTraccar;
 import com.galileo.cu.unidadesusuarios.clientes.TraccarClient;
 import com.galileo.cu.unidadesusuarios.repositorios.ConexionesRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.ExpiraUserRepository;
+import com.galileo.cu.unidadesusuarios.repositorios.PermisosRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.UsuariosRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,10 +39,13 @@ public class ExpirationCheckTask {
     private TraccarClient traccarClient;
 
     @Autowired
+    PermisosRepository perRepo;
+
+    @Autowired
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 45 3 * * *")
+    @Scheduled(cron = "0 26 15 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -47,9 +53,15 @@ public class ExpirationCheckTask {
         // comparación precisa
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault()).withNano(0);
 
-        List<UnidadesUsuarios> expiredRecords = expiraUserRepository.findByExpiraBefore(now);
-        log.info("::::::NOW==" + now.toString());
-        log.info("::::::QUANTY==" + expiredRecords.size());
+        List<UnidadesUsuarios> expiredRecords = null;
+        try {
+            expiredRecords = expiraUserRepository.findByExpiraBefore(now);
+            log.info("::::::NOW==" + now.toString());
+            log.info("::::::QUANTY==" + expiredRecords.size());
+        } catch (Exception e) {
+            log.error("*******Fallo consultando los usuarios expirados: ", e.getMessage());
+            throw new RuntimeException("Fallo consultando los usuarios expirados");
+        }
 
         for (UnidadesUsuarios record : expiredRecords) {
             log.info("Registro expirado: " + record.getUsuario().getTraccarID());
@@ -58,19 +70,65 @@ public class ExpirationCheckTask {
             // log.info("Conexión Usuario: " + con.getUsuario());
 
             // String resDevices =
-            List<DevicesTraccar> resDevices = traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
-            // List<DevicesTraccar> resDevices = traccarClient.getDevices("1035");
+            List<DevicesTraccar> resDevices = null;
+            try {
+                resDevices = traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
+            } catch (Exception e) {
+                log.error("*******Fallo consultando dispocitivos en traccar: ", e.getMessage());
+                throw new RuntimeException("Fallo consultando dispocitivos en traccar");
+            }
 
             for (DevicesTraccar dt : resDevices) {
+                try {
+                    BodyDelDevicePermissions bDDP = new BodyDelDevicePermissions(record.getUsuario().getTraccarID(),
+                            dt.getId());
+                    try {
+                        traccarClient.delDevices(bDDP);
+                    } catch (Exception e) {
+                        log.error("*******Fallo eliminando dispositivo en traccar: ", e.getMessage());
+                        throw new RuntimeException("Fallo eliminando dispositivo en traccar");
+                    }
+                } catch (Exception e) {
+                    log.error("*******Fallo iterando dispositivos en traccar: ", e.getMessage());
+                    throw new RuntimeException("Fallo iterando dispositivos en traccar");
+                }
                 log.info(dt.getName());
             }
 
-            List<GroupsTraccar> resGroups = traccarClient.getGroups(record.getUsuario().getTraccarID().toString());
+            List<GroupsTraccar> resGroups = null;
+            try {
+                resGroups = traccarClient.getGroups(record.getUsuario().getTraccarID().toString());
+            } catch (Exception e) {
+                log.error("*******Fallo consultando grupos en traccar: ", e.getMessage());
+                throw new RuntimeException("Fallo consultando grupos en traccar");
+            }
+
             for (GroupsTraccar gt : resGroups) {
-                BodyDelGroupPermissions bDGP = new BodyDelGroupPermissions(record.getUsuario().getTraccarID(),
-                        gt.getId());
-                traccarClient.delGroups(bDGP);
-                log.info(gt.getName());
+                try {
+                    BodyDelGroupPermissions bDGP = new BodyDelGroupPermissions(record.getUsuario().getTraccarID(),
+                            gt.getId());
+                    try {
+                        traccarClient.delGroups(bDGP);
+                    } catch (Exception e) {
+                        log.error("*******Fallo eliminando grupo en traccar: ", e.getMessage());
+                        throw new RuntimeException("Fallo eliminando grupo en traccar");
+                    }
+                    log.info(gt.getName());
+                } catch (Exception e) {
+                    log.error("*******Fallo iterando grupos en traccar: ", e.getMessage());
+                    throw new RuntimeException("Fallo iterando grupos en traccar");
+                }
+            }
+
+            try {
+                List<Permisos> permisos = perRepo.findByUsuarios(record.getUsuario());
+                for (Permisos per : permisos) {
+                    perRepo.delete(per);
+                }
+            } catch (Exception e) {
+                log.error("Fallo eliminando los Permisos del Usuario en Operaciones y Objetivos");
+                log.error(e.getMessage());
+                throw new RuntimeException("Fallo eliminando los Permisos del Usuario en Operaciones y Objetivos");
             }
         }
     }
