@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.galileo.cu.commons.models.Conexiones;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
 import com.galileo.cu.commons.models.Usuarios;
+import com.galileo.cu.commons.models.dto.BodyDelGroupPermissions;
 import com.galileo.cu.commons.models.dto.DevicesTraccar;
 import com.galileo.cu.commons.models.dto.GroupsTraccar;
 import com.galileo.cu.unidadesusuarios.clientes.TraccarClient;
@@ -38,7 +39,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 0 3 * * *")
+    @Scheduled(cron = "0 33 3 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -66,6 +67,8 @@ public class ExpirationCheckTask {
 
             List<GroupsTraccar> resGroups = traccarClient.getGroups(record.getUsuario().getTraccarID().toString());
             for (GroupsTraccar gt : resGroups) {
+                BodyDelGroupPermissions bDGP = new BodyDelGroupPermissions(record.getUsuario().getTraccarID(),
+                        gt.getId());
                 log.info(gt.getName());
             }
         }
