@@ -6,7 +6,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.galileo.cu.commons.models.Conexiones;
+import com.galileo.cu.commons.models.Objetivos;
 import com.galileo.cu.commons.models.Permisos;
+import com.galileo.cu.commons.models.Unidades;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
 import com.galileo.cu.commons.models.Usuarios;
 import com.galileo.cu.commons.models.dto.BodyDelDevicePermissions;
@@ -16,6 +18,8 @@ import com.galileo.cu.commons.models.dto.GroupsTraccar;
 import com.galileo.cu.unidadesusuarios.clientes.TraccarClient;
 import com.galileo.cu.unidadesusuarios.repositorios.ConexionesRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.ExpiraUserRepository;
+import com.galileo.cu.unidadesusuarios.repositorios.ObjetivosRepository;
+import com.galileo.cu.unidadesusuarios.repositorios.OperacionesRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.PermisosRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.UnidadesUsuariosRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.UsuariosRepository;
@@ -43,13 +47,19 @@ public class ExpirationCheckTask {
     PermisosRepository perRepo;
 
     @Autowired
+    ObjetivosRepository objRepo;
+
+    @Autowired
+    OperacionesRepository operRepo;
+
+    @Autowired
     private UnidadesUsuariosRepository uuRepo;
 
     @Autowired
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 7 16 * * *")
+    @Scheduled(cron = "0 35 22 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -69,11 +79,9 @@ public class ExpirationCheckTask {
 
         for (UnidadesUsuarios record : expiredRecords) {
             log.info("Registro expirado: " + record.getUsuario().getTraccarID());
-            // List<Conexiones> cons = conRepo.findByServicio("TRACCAR");
-            // Conexiones con = cons.get(0);
-            // log.info("Conexión Usuario: " + con.getUsuario());
 
-            // String resDevices =
+            Unidades unidad = record.getUnidad();
+
             List<DevicesTraccar> resDevices = null;
             try {
                 resDevices = traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
@@ -86,12 +94,16 @@ public class ExpirationCheckTask {
                 try {
                     BodyDelDevicePermissions bDDP = new BodyDelDevicePermissions(record.getUsuario().getTraccarID(),
                             dt.getId());
-                    try {
-                        traccarClient.delDevices(bDDP);
-                    } catch (Exception e) {
-                        log.error("*******Fallo eliminando dispositivo en traccar: ", e.getMessage());
-                        throw new RuntimeException("Fallo eliminando dispositivo en traccar");
-                    }
+                    List<Objetivos> objs = objRepo
+                            .findByTraccarIDAndOperaciones_Unidades(Long.valueOf(dt.getId()), unidad);
+                    log.info("######" + dt.getId() + ":::" + objs.size());
+                    // try {
+                    // traccarClient.delDevices(bDDP);
+                    // } catch (Exception e) {
+                    // log.error("*******Fallo eliminando dispositivo en traccar: ",
+                    // e.getMessage());
+                    // throw new RuntimeException("Fallo eliminando dispositivo en traccar");
+                    // }
                 } catch (Exception e) {
                     log.error("*******Fallo iterando dispositivos en traccar: ", e.getMessage());
                     throw new RuntimeException("Fallo iterando dispositivos en traccar");
@@ -107,41 +119,45 @@ public class ExpirationCheckTask {
                 throw new RuntimeException("Fallo consultando grupos en traccar");
             }
 
-            for (GroupsTraccar gt : resGroups) {
-                try {
-                    BodyDelGroupPermissions bDGP = new BodyDelGroupPermissions(record.getUsuario().getTraccarID(),
-                            gt.getId());
-                    try {
-                        traccarClient.delGroups(bDGP);
-                    } catch (Exception e) {
-                        log.error("*******Fallo eliminando grupo en traccar: ", e.getMessage());
-                        throw new RuntimeException("Fallo eliminando grupo en traccar");
-                    }
-                    log.info(gt.getName());
-                } catch (Exception e) {
-                    log.error("*******Fallo iterando grupos en traccar: ", e.getMessage());
-                    throw new RuntimeException("Fallo iterando grupos en traccar");
-                }
-            }
+            // for (GroupsTraccar gt : resGroups) {
+            // try {
+            // BodyDelGroupPermissions bDGP = new
+            // BodyDelGroupPermissions(record.getUsuario().getTraccarID(),
+            // gt.getId());
+            // try {
+            // traccarClient.delGroups(bDGP);
+            // } catch (Exception e) {
+            // log.error("*******Fallo eliminando grupo en traccar: ", e.getMessage());
+            // throw new RuntimeException("Fallo eliminando grupo en traccar");
+            // }
+            // log.info(gt.getName());
+            // } catch (Exception e) {
+            // log.error("*******Fallo iterando grupos en traccar: ", e.getMessage());
+            // throw new RuntimeException("Fallo iterando grupos en traccar");
+            // }
+            // }
 
-            try {
-                List<Permisos> permisos = perRepo.findByUsuarios(record.getUsuario());
-                for (Permisos per : permisos) {
-                    perRepo.delete(per);
-                }
-            } catch (Exception e) {
-                log.error("Fallo eliminando los Permisos del Usuario en Operaciones y Objetivos");
-                log.error(e.getMessage());
-                throw new RuntimeException("Fallo eliminando los Permisos del Usuario en Operaciones y Objetivos");
-            }
+            // try {
+            // List<Permisos> permisos = perRepo.findByUsuarios(record.getUsuario());
+            // for (Permisos per : permisos) {
+            // perRepo.delete(per);
+            // }
+            // } catch (Exception e) {
+            // log.error("Fallo eliminando los Permisos del Usuario en Operaciones y
+            // Objetivos");
+            // log.error(e.getMessage());
+            // throw new RuntimeException("Fallo eliminando los Permisos del Usuario en
+            // Operaciones y Objetivos");
+            // }
 
-            try {
-                uuRepo.delete(uuRepo.findById(record.getId()).get());
-            } catch (Exception e) {
-                log.error("Fallo eliminando la relación del usuario con la unidad");
-                log.error(e.getMessage());
-                throw new RuntimeException("Fallo eliminando la relación del usuario con la unidad");
-            }
+            // try {
+            // uuRepo.delete(uuRepo.findById(record.getId()).get());
+            // } catch (Exception e) {
+            // log.error("Fallo eliminando la relación del usuario con la unidad");
+            // log.error(e.getMessage());
+            // throw new RuntimeException("Fallo eliminando la relación del usuario con la
+            // unidad");
+            // }
         }
     }
 }

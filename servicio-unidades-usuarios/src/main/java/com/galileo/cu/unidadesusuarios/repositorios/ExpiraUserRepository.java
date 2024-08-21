@@ -9,7 +9,7 @@ import com.galileo.cu.commons.models.UnidadesUsuarios;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@RepositoryRestResource(exported = false)
+@RepositoryRestResource(exported = false) // para que no exponga http
 public interface ExpiraUserRepository extends JpaRepository<UnidadesUsuarios, Long> {
     List<UnidadesUsuarios> findByExpiraBefore(LocalDateTime dateTime);
 }

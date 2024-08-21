@@ -12,4 +12,6 @@ public interface PermisosRepository extends CrudRepository<Permisos, Long> {
 
     List<Permisos> findByUsuarios(Usuarios usu);
 
+    List<Permisos> findByUsuariosAndIdEntidad(Usuarios usu, int idEntidad);
+
 }
