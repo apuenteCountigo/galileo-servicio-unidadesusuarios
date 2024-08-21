@@ -1,12 +1,14 @@
 package com.galileo.cu.unidadesusuarios.servicios;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.galileo.cu.commons.models.Conexiones;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
 import com.galileo.cu.commons.models.Usuarios;
+import com.galileo.cu.commons.models.dto.DevicesTraccar;
 import com.galileo.cu.unidadesusuarios.clientes.TraccarClient;
 import com.galileo.cu.unidadesusuarios.repositorios.ConexionesRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.ExpiraUserRepository;
@@ -35,7 +37,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 43 1 * * *")
+    @Scheduled(cron = "0 13 2 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -55,8 +57,8 @@ public class ExpirationCheckTask {
 
             // String resDevices =
             // traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
-            String resDevices = traccarClient.getDevices("1035");
-            log.info(resDevices);
+            List<DevicesTraccar> resDevices = traccarClient.getDevices("1035");
+            log.info(resDevices.get(0).getName());
         }
     }
 }

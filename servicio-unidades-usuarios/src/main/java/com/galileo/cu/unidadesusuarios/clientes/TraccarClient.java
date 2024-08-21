@@ -1,8 +1,11 @@
 package com.galileo.cu.unidadesusuarios.clientes;
 
+import com.galileo.cu.commons.models.dto.DevicesTraccar;
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
                                                                                                    // DynamicFeignUrlInterceptor.class)
 public interface TraccarClient {
     @GetMapping("/devices")
-    String getDevices(@RequestParam("userId") String userId);
+    List<DevicesTraccar> getDevices(@RequestParam("userId") String userId);
 
     @GetMapping("/groups")
     String getGroups(@RequestParam("userId") String userId);
