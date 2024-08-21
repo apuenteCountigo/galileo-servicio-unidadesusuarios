@@ -59,7 +59,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 45 22 * * *")
+    @Scheduled(cron = "0 0 23 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -97,6 +97,9 @@ public class ExpirationCheckTask {
                     List<Objetivos> objs = objRepo
                             .findByTraccarIDAndOperaciones_Unidades(Long.valueOf(dt.getId()), unidad);
                     log.info("######" + dt.getId() + ":::" + objs.size());
+                    if (objs.size() > 0) {
+                        log.info("****Eliminando Permiso en dispositivo");
+                    }
                     // try {
                     // traccarClient.delDevices(bDDP);
                     // } catch (Exception e) {
