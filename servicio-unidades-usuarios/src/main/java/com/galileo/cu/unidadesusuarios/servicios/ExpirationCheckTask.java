@@ -17,6 +17,7 @@ import com.galileo.cu.unidadesusuarios.clientes.TraccarClient;
 import com.galileo.cu.unidadesusuarios.repositorios.ConexionesRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.ExpiraUserRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.PermisosRepository;
+import com.galileo.cu.unidadesusuarios.repositorios.UnidadesUsuariosRepository;
 import com.galileo.cu.unidadesusuarios.repositorios.UsuariosRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +43,13 @@ public class ExpirationCheckTask {
     PermisosRepository perRepo;
 
     @Autowired
+    private UnidadesUsuariosRepository uuRepo;
+
+    @Autowired
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 26 15 * * *")
+    @Scheduled(cron = "0 52 15 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -129,6 +133,14 @@ public class ExpirationCheckTask {
                 log.error("Fallo eliminando los Permisos del Usuario en Operaciones y Objetivos");
                 log.error(e.getMessage());
                 throw new RuntimeException("Fallo eliminando los Permisos del Usuario en Operaciones y Objetivos");
+            }
+
+            try {
+                uuRepo.delete(uuRepo.findById(record.getUsuario().getId()).get());
+            } catch (Exception e) {
+                log.error("Fallo eliminando la relación del usuario con la unidad");
+                log.error(e.getMessage());
+                throw new RuntimeException("Fallo eliminando la relación del usuario con la unidad");
             }
         }
     }
