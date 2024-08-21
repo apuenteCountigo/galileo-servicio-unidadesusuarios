@@ -9,6 +9,7 @@ import com.galileo.cu.commons.models.Conexiones;
 import com.galileo.cu.commons.models.Objetivos;
 import com.galileo.cu.commons.models.Operaciones;
 import com.galileo.cu.commons.models.Permisos;
+import com.galileo.cu.commons.models.TipoEntidad;
 import com.galileo.cu.commons.models.Unidades;
 import com.galileo.cu.commons.models.UnidadesUsuarios;
 import com.galileo.cu.commons.models.Usuarios;
@@ -60,7 +61,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 12 23 * * *")
+    @Scheduled(cron = "0 46 23 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -100,14 +101,22 @@ public class ExpirationCheckTask {
                     log.info("######" + dt.getId() + ":::" + objs.size());
                     if (objs.size() > 0) {
                         log.info("****Eliminando Permiso en dispositivo");
+                        TipoEntidad tipoEntidad = new TipoEntidad();
+                        tipoEntidad.setId(8);
+                        tipoEntidad.setDescripcion("objetivos");
+
+                        List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(record.getUsuario(),
+                                objs.get(0).getId().intValue(), tipoEntidad);
+                        // perRepo.delete(permisos.get(0));
+                        log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
                     }
-                    // try {
-                    // traccarClient.delDevices(bDDP);
-                    // } catch (Exception e) {
-                    // log.error("*******Fallo eliminando dispositivo en traccar: ",
-                    // e.getMessage());
-                    // throw new RuntimeException("Fallo eliminando dispositivo en traccar");
-                    // }
+                    try {
+                        // traccarClient.delDevices(bDDP);
+                    } catch (Exception e) {
+                        log.error("*******Fallo eliminando dispositivo en traccar: ",
+                                e.getMessage());
+                        throw new RuntimeException("Fallo eliminando dispositivo en traccar");
+                    }
                 } catch (Exception e) {
                     log.error("*******Fallo iterando dispositivos en traccar: ", e.getMessage());
                     throw new RuntimeException("Fallo iterando dispositivos en traccar");
@@ -132,13 +141,21 @@ public class ExpirationCheckTask {
                     log.info("######" + gt.getId() + ":::" + ops.size());
                     if (ops.size() > 0) {
                         log.info("****Eliminando Permiso en Grupo");
+                        TipoEntidad tipoEntidad = new TipoEntidad();
+                        tipoEntidad.setId(6);
+                        tipoEntidad.setDescripcion("operaciones");
+
+                        List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(record.getUsuario(),
+                                ops.get(0).getId().intValue(), tipoEntidad);
+                        // perRepo.delete(permisos.get(0));
+                        log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
                     }
-                    // try {
-                    // traccarClient.delGroups(bDGP);
-                    // } catch (Exception e) {
-                    // log.error("*******Fallo eliminando grupo en traccar: ", e.getMessage());
-                    // throw new RuntimeException("Fallo eliminando grupo en traccar");
-                    // }
+                    try {
+                        // traccarClient.delGroups(bDGP);
+                    } catch (Exception e) {
+                        log.error("*******Fallo eliminando grupo en traccar: ", e.getMessage());
+                        throw new RuntimeException("Fallo eliminando grupo en traccar");
+                    }
                     log.info(gt.getName());
                 } catch (Exception e) {
                     log.error("*******Fallo iterando grupos en traccar: ", e.getMessage());
@@ -146,27 +163,24 @@ public class ExpirationCheckTask {
                 }
             }
 
-            // try {
-            // List<Permisos> permisos = perRepo.findByUsuarios(record.getUsuario());
-            // for (Permisos per : permisos) {
-            // perRepo.delete(per);
-            // }
-            // } catch (Exception e) {
-            // log.error("Fallo eliminando los Permisos del Usuario en Operaciones y
-            // Objetivos");
-            // log.error(e.getMessage());
-            // throw new RuntimeException("Fallo eliminando los Permisos del Usuario en
-            // Operaciones y Objetivos");
-            // }
+            try {
+                // List<Permisos> permisos = perRepo.findByUsuarios(record.getUsuario());
+                // for (Permisos per : permisos) {
+                // // perRepo.delete(per);
+                // }
+            } catch (Exception e) {
+                log.error("Fallo eliminando los Permisos del Usuario en Operaciones y Objetivos");
+                log.error(e.getMessage());
+                throw new RuntimeException("Fallo eliminando los Permisos del Usuario en Operaciones y Objetivos");
+            }
 
-            // try {
-            // uuRepo.delete(uuRepo.findById(record.getId()).get());
-            // } catch (Exception e) {
-            // log.error("Fallo eliminando la relación del usuario con la unidad");
-            // log.error(e.getMessage());
-            // throw new RuntimeException("Fallo eliminando la relación del usuario con la
-            // unidad");
-            // }
+            try {
+                // uuRepo.delete(uuRepo.findById(record.getId()).get());
+            } catch (Exception e) {
+                log.error("Fallo eliminando la relación del usuario con la unidad");
+                log.error(e.getMessage());
+                throw new RuntimeException("Fallo eliminando la relación del usuario con la unidad");
+            }
         }
     }
 }
