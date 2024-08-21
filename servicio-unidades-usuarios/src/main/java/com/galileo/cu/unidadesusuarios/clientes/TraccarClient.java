@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
                                                                                                    // DynamicFeignUrlInterceptor.class)
 public interface TraccarClient {
     @GetMapping("/devices")
-    String getDevices(URI uri, @RequestParam("userId") String userId);
+    String getDevices(@RequestParam("userId") String userId);
 
     @GetMapping("/groups")
     String getGroups(@RequestParam("userId") String userId);
