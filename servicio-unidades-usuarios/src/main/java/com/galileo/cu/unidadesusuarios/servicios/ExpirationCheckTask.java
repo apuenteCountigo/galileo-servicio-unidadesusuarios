@@ -61,7 +61,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 14 00 * * *")
+    @Scheduled(cron = "0 22 00 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -109,7 +109,7 @@ public class ExpirationCheckTask {
                             List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(
                                     record.getUsuario(),
                                     objs.get(0).getId(), tipoEntidad);
-                            // perRepo.delete(permisos.get(0));
+                            perRepo.delete(permisos.get(0));
                             log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
                         } catch (Exception e) {
                             log.error("*******Fallo eliminando Permiso de Objetivo en BD: " +
@@ -118,7 +118,7 @@ public class ExpirationCheckTask {
                         }
                     }
                     try {
-                        // traccarClient.delDevices(bDDP);
+                        traccarClient.delDevices(bDDP);
                     } catch (Exception e) {
                         log.error("*******Fallo eliminando dispositivo en traccar: " +
                                 e.getMessage());
@@ -155,7 +155,7 @@ public class ExpirationCheckTask {
                             List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(
                                     record.getUsuario(),
                                     ops.get(0).getId(), tipoEntidad);
-                            // perRepo.delete(permisos.get(0));
+                            perRepo.delete(permisos.get(0));
                             log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
                         } catch (Exception e) {
                             log.error("*******Fallo eliminando Permiso de Operación en BD: " +
@@ -164,7 +164,7 @@ public class ExpirationCheckTask {
                         }
                     }
                     try {
-                        // traccarClient.delGroups(bDGP);
+                        traccarClient.delGroups(bDGP);
                     } catch (Exception e) {
                         log.error("*******Fallo eliminando grupo en traccar: " + e.getMessage());
                         throw new RuntimeException("Fallo eliminando grupo en traccar");
@@ -188,7 +188,7 @@ public class ExpirationCheckTask {
             }
 
             try {
-                // uuRepo.delete(uuRepo.findById(record.getId()).get());
+                uuRepo.delete(uuRepo.findById(record.getId()).get());
             } catch (Exception e) {
                 log.error("Fallo eliminando la relación del usuario con la unidad");
                 log.error(e.getMessage());
