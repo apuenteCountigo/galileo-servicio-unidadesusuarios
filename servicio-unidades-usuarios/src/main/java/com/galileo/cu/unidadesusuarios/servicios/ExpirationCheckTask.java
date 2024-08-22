@@ -61,7 +61,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 58 23 * * *")
+    @Scheduled(cron = "0 7 00 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -75,7 +75,7 @@ public class ExpirationCheckTask {
             log.info("::::::NOW==" + now.toString());
             log.info("::::::QUANTY==" + expiredRecords.size());
         } catch (Exception e) {
-            log.error("*******Fallo consultando los usuarios expirados: ", e.getMessage());
+            log.error("*******Fallo consultando los usuarios expirados: " + e.getMessage());
             throw new RuntimeException("Fallo consultando los usuarios expirados");
         }
 
@@ -88,7 +88,7 @@ public class ExpirationCheckTask {
             try {
                 resDevices = traccarClient.getDevices(record.getUsuario().getTraccarID().toString());
             } catch (Exception e) {
-                log.error("*******Fallo consultando dispocitivos en traccar: ", e.getMessage());
+                log.error("*******Fallo consultando dispocitivos en traccar: " + e.getMessage());
                 throw new RuntimeException("Fallo consultando dispocitivos en traccar");
             }
 
@@ -105,20 +105,27 @@ public class ExpirationCheckTask {
                         tipoEntidad.setId(8);
                         tipoEntidad.setDescripcion("objetivos");
 
-                        List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(record.getUsuario(),
-                                objs.get(0).getId().intValue(), tipoEntidad);
-                        // perRepo.delete(permisos.get(0));
-                        log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
+                        try {
+                            List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(
+                                    record.getUsuario(),
+                                    objs.get(0).getId().intValue(), tipoEntidad);
+                            // perRepo.delete(permisos.get(0));
+                            log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
+                        } catch (Exception e) {
+                            log.error("*******Fallo eliminando Permiso de Objetivo en BD: " +
+                                    e.getMessage());
+                            throw new RuntimeException("Fallo eliminando Permiso de Objetivo en BD");
+                        }
                     }
                     try {
                         // traccarClient.delDevices(bDDP);
                     } catch (Exception e) {
-                        log.error("*******Fallo eliminando dispositivo en traccar: ",
+                        log.error("*******Fallo eliminando dispositivo en traccar: " +
                                 e.getMessage());
                         throw new RuntimeException("Fallo eliminando dispositivo en traccar");
                     }
                 } catch (Exception e) {
-                    log.error("*******Fallo iterando dispositivos en traccar: ", e.getMessage());
+                    log.error("*******Fallo iterando dispositivos en traccar: " + e.getMessage());
                     throw new RuntimeException("Fallo iterando dispositivos en traccar");
                 }
                 log.info(dt.getName());
@@ -128,7 +135,7 @@ public class ExpirationCheckTask {
             try {
                 resGroups = traccarClient.getGroups(record.getUsuario().getTraccarID().toString());
             } catch (Exception e) {
-                log.error("*******Fallo consultando grupos en traccar: ", e.getMessage());
+                log.error("*******Fallo consultando grupos en traccar: " + e.getMessage());
                 throw new RuntimeException("Fallo consultando grupos en traccar");
             }
 
@@ -153,12 +160,12 @@ public class ExpirationCheckTask {
                     try {
                         // traccarClient.delGroups(bDGP);
                     } catch (Exception e) {
-                        log.error("*******Fallo eliminando grupo en traccar: ", e.getMessage());
+                        log.error("*******Fallo eliminando grupo en traccar: " + e.getMessage());
                         throw new RuntimeException("Fallo eliminando grupo en traccar");
                     }
                     log.info(gt.getName());
                 } catch (Exception e) {
-                    log.error("*******Fallo iterando grupos en traccar: ", e.getMessage());
+                    log.error("*******Fallo iterando grupos en traccar: " + e.getMessage());
                     throw new RuntimeException("Fallo iterando grupos en traccar");
                 }
             }
