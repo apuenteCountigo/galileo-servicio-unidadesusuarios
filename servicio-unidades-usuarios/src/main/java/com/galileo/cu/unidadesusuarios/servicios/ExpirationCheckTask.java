@@ -61,7 +61,7 @@ public class ExpirationCheckTask {
     private ConexionesRepository conRepo;
 
     // @Scheduled(cron = "0 0 0 * * *") // Ejecutar todos los días a las 00:00
-    @Scheduled(cron = "0 7 00 * * *")
+    @Scheduled(cron = "0 14 00 * * *")
     public void checkForExpiredRecords() {
         log.info("::::::EXPIRANDO::::: ");
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
@@ -108,7 +108,7 @@ public class ExpirationCheckTask {
                         try {
                             List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(
                                     record.getUsuario(),
-                                    objs.get(0).getId().intValue(), tipoEntidad);
+                                    objs.get(0).getId(), tipoEntidad);
                             // perRepo.delete(permisos.get(0));
                             log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
                         } catch (Exception e) {
@@ -151,11 +151,17 @@ public class ExpirationCheckTask {
                         TipoEntidad tipoEntidad = new TipoEntidad();
                         tipoEntidad.setId(6);
                         tipoEntidad.setDescripcion("operaciones");
-
-                        List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(record.getUsuario(),
-                                ops.get(0).getId().intValue(), tipoEntidad);
-                        // perRepo.delete(permisos.get(0));
-                        log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
+                        try {
+                            List<Permisos> permisos = perRepo.findByUsuariosAndIdEntidadAndTipoEntidad(
+                                    record.getUsuario(),
+                                    ops.get(0).getId(), tipoEntidad);
+                            // perRepo.delete(permisos.get(0));
+                            log.info("!!!!!Eliminando Permiso en BD:::" + permisos.get(0).getId());
+                        } catch (Exception e) {
+                            log.error("*******Fallo eliminando Permiso de Operación en BD: " +
+                                    e.getMessage());
+                            throw new RuntimeException("Fallo eliminando Permiso de Operación en BD");
+                        }
                     }
                     try {
                         // traccarClient.delGroups(bDGP);
