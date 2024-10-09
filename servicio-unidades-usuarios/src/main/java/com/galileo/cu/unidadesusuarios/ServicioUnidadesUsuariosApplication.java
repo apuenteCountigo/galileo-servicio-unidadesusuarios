@@ -22,7 +22,7 @@ public class ServicioUnidadesUsuariosApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("**************************************");
-		System.out.println("Unidades Usuarios V-2408201901");
+		System.out.println("Unidades Usuarios V-24-10-09 10:10");
 	}
 
 }
