@@ -46,11 +46,11 @@ jobs:
           script: |
             ssh -i ~/id_rsaalain mome@192.168.0.212 '
             cd galileo-dev-v1.1/unidadesusuarios &&
-            if [ ! -d "galileo-servicio-unidades-usuarios" ]; then
-              echo "validada galileo-dev-v1.1/oauth2/galileo-servicio-unidades-usuarios" &&
-              git clone https://github.com/apuenteCountigo/galileo-servicio-unidades-usuarios.git
+            if [ ! -d "galileo-servicio-unidadesusuarios" ]; then
+              echo "validada galileo-dev-v1.1/oauth2/galileo-servicio-unidadesusuarios" &&
+              git clone https://github.com/apuenteCountigo/galileo-servicio-unidadesusuarios.git
             fi
-            cd galileo-servicio-unidades-usuarios &&
+            cd galileo-servicio-unidadesusuarios &&
             git fetch origin &&
             git checkout version-1.1 &&
             git reset --hard origin/version-1.1 &&
