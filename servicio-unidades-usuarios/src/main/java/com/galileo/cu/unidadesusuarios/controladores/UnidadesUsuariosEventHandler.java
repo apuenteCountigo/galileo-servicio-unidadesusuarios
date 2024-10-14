@@ -61,7 +61,6 @@ public class UnidadesUsuariosEventHandler {
 		/* Validando Autorización */
 		ValidateAuthorization val = new ValidateAuthorization();
 		try {
-			System.out.println("REQUEST HandleBeforeCreate: " + req.getMethod());
 			val.setObjectMapper(objectMapper);
 			val.setReq(req);
 			if (!val.Validate()) {
@@ -85,7 +84,6 @@ public class UnidadesUsuariosEventHandler {
 		/* Validando Autorización */
 		ValidateAuthorization val = new ValidateAuthorization();
 		try {
-			System.out.println("REQUEST HandleAfterCreate: " + req.getMethod());
 			val.setObjectMapper(objectMapper);
 			val.setReq(req);
 			if (!val.Validate()) {
