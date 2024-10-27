@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.galileo.cu.commons.models.UnidadesUsuarios;
@@ -34,9 +33,7 @@ public interface UnidadesUsuariosRepository extends PagingAndSortingRepository<U
 			+ "  OR (:fechaFin IS NULL AND :fechaInicio IS NULL) "
 			+ ") ")
 	public Page<UnidadesUsuarios> filtrarUsuarios(long idAuth, int idUnidad, int idEstado, String tip,
-			String nombre, String apellidos,
-			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
-			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin, Pageable p);
+			String nombre, String apellidos, LocalDateTime fechaInicio, LocalDateTime fechaFin, Pageable p);
 
 	@Query("SELECT u FROM UnidadesUsuarios u WHERE (:idUsuario = 0 OR u.usuario.id = :idUsuario) "
 			+ "AND (:idEstado = 0 OR u.estado.Id = :idEstado) "
