@@ -74,8 +74,13 @@ public class UnidadesUsuariosEventHandler {
 
 		Usuarios usu = usuRepo.findById(uu.getUsuario().getId()).get();
 		if (usu.getPerfil().getId() == 1) {
-			System.out.println("Fallo, No se Puede Asignar un Usuario Super Administrador a una Unidad");
+			log.error("Fallo, No se Puede Asignar un Usuario Super Administrador a una Unidad");
 			throw new RuntimeException("No se Puede Asignar un Usuario Super Administrador a una Unidad");
+		} else if (usu.getUnidad() != null) {
+			String err = "Fallo, el usuario ya ha sido asignado como permanente a la unidad: "
+					+ usu.getUnidad().getDenominacion();
+			log.error(err);
+			throw new RuntimeException(err);
 		}
 	}
 
