@@ -76,7 +76,7 @@ public class UnidadesUsuariosEventHandler {
 		if (usu.getPerfil().getId() == 1) {
 			log.error("Fallo, No se Puede Asignar un Usuario Super Administrador a una Unidad");
 			throw new RuntimeException("No se Puede Asignar un Usuario Super Administrador a una Unidad");
-		} else if (usu.getUnidad() != null) {
+		} else if (usu.getUnidad() != null && uu.getEstado().getId() == 6) {
 			String err = "Fallo, el usuario ya ha sido asignado como permanente a la unidad: "
 					+ usu.getUnidad().getDenominacion();
 			log.error(err);
